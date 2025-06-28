@@ -1,18 +1,37 @@
-# from transformers import T5ForConditionalGeneration,T5Tokenizer, AutoTokenizer
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
-from sentence_transformers import SentenceTransformer
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, BertTokenizer, BertModel
 import streamlit as st
+import torch
+import numpy as np
 
+class SimpleBertEncoder:
+    def __init__(self):
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.model = BertModel.from_pretrained('bert-base-uncased')
+        self.model.eval()
+    
+    def encode(self, sentences):
+        if isinstance(sentences, str):
+            sentences = [sentences]
+        
+        embeddings = []
+        for sentence in sentences:
+            # Tokenize and encode
+            inputs = self.tokenizer(sentence, return_tensors='pt', 
+                                  truncation=True, padding=True, max_length=512)
+            
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+                # Use [CLS] token embedding (first token)
+                sentence_embedding = outputs.last_hidden_state[:, 0, :].squeeze()
+                embeddings.append(sentence_embedding.numpy())
+        
+        return np.array(embeddings)
 
 @st.cache_resource()
 def load_question_model():
     tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     model = GPT2LMHeadModel.from_pretrained(
         "gpt2", pad_token_id=tokenizer.eos_token_id)
-    model_BERT = SentenceTransformer('bert-base-nli-mean-tokens')
+    model_BERT = SimpleBertEncoder()
 
     return model, model_BERT, tokenizer
-
-
-# Load the BERT model. Various models trained on Natural Language Inference (NLI) https://github.com/UKPLab/sentence-transformers/blob/master/docs/pretrained-models/nli-models.md and
-# Semantic Textual Similarity are available https://github.com/UKPLab/sentence-transformers/blob/master/docs/pretrained-models/sts-models.md
