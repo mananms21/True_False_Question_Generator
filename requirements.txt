@@ -1,9 +1,9 @@
-benepar
-ipython
-scipy
-nltk
-summa
+streamlit
 torch
 transformers
 sentence-transformers
-streamlit
+nltk
+scipy
+benepar
+summa
+ipython
