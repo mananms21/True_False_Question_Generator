@@ -1,7 +1,7 @@
-benepar
-scipy
-nltk
-summa
-torch
-transformers
 streamlit
+torch==1.13.1
+transformers==4.21.0
+benepar==0.2.0
+scipy==1.9.3
+nltk==3.8.0
+summa==1.2.0
