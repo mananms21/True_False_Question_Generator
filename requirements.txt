@@ -4,5 +4,4 @@ nltk
 summa
 torch
 transformers
-sentence-transformers==2.1.0
 streamlit
