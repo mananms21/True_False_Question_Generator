@@ -1,5 +1,5 @@
 import benepar
-from IPython.display import Markdown, display
+# from IPython.display import Markdown, display
 import re
 from string import punctuation
 import scipy
@@ -13,8 +13,8 @@ benepar_parser = benepar.Parser("benepar_en3")
 model, model_BERT, tokenizer = load_question_model()
 
 
-def printmd(string):
-    display(Markdown(string))
+# def printmd(string):
+#     display(Markdown(string))
 
 
 def read_file(file_path):
