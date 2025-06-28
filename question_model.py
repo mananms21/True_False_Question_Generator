@@ -1,12 +1,13 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer, BertTokenizer, BertModel
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, AutoTokenizer, AutoModel
 import streamlit as st
 import torch
 import numpy as np
 
 class SimpleBertEncoder:
     def __init__(self):
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        self.model = BertModel.from_pretrained('bert-base-uncased')
+        # Use DistilBERT instead - smaller and doesn't use sentencepiece
+        self.tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+        self.model = AutoModel.from_pretrained('distilbert-base-uncased')
         self.model.eval()
     
     def encode(self, sentences):
@@ -15,7 +16,6 @@ class SimpleBertEncoder:
         
         embeddings = []
         for sentence in sentences:
-            # Tokenize and encode
             inputs = self.tokenizer(sentence, return_tensors='pt', 
                                   truncation=True, padding=True, max_length=512)
             
