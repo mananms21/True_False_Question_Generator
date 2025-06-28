@@ -1,37 +1,38 @@
-from transformers import GPT2LMHeadModel, GPT2Tokenizer, AutoTokenizer, AutoModel
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import streamlit as st
 import torch
 import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-class SimpleBertEncoder:
+class BertAlternativeEncoder:
     def __init__(self):
-        # Use DistilBERT instead - smaller and doesn't use sentencepiece
-        self.tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
-        self.model = AutoModel.from_pretrained('distilbert-base-uncased')
-        self.model.eval()
+        self.vectorizer = TfidfVectorizer(
+            stop_words='english', 
+            max_features=5000,
+            ngram_range=(1, 2),
+            sublinear_tf=True
+        )
+        self.is_fitted = False
     
     def encode(self, sentences):
         if isinstance(sentences, str):
             sentences = [sentences]
         
-        embeddings = []
-        for sentence in sentences:
-            inputs = self.tokenizer(sentence, return_tensors='pt', 
-                                  truncation=True, padding=True, max_length=512)
-            
-            with torch.no_grad():
-                outputs = self.model(**inputs)
-                # Use [CLS] token embedding (first token)
-                sentence_embedding = outputs.last_hidden_state[:, 0, :].squeeze()
-                embeddings.append(sentence_embedding.numpy())
+        if not self.is_fitted:
+            # Fit on all sentences to ensure consistent feature space
+            all_sentences = sentences
+            self.vectorizer.fit(all_sentences)
+            self.is_fitted = True
         
-        return np.array(embeddings)
+        vectors = self.vectorizer.transform(sentences)
+        return vectors.toarray()
 
 @st.cache_resource()
 def load_question_model():
     tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     model = GPT2LMHeadModel.from_pretrained(
         "gpt2", pad_token_id=tokenizer.eos_token_id)
-    model_BERT = SimpleBertEncoder()
+    model_BERT = BertAlternativeEncoder()
 
     return model, model_BERT, tokenizer
