@@ -1,7 +1,9 @@
 benepar
-IPython.display
-re
+ipython
 scipy
 nltk
 summa
 torch
+transformers
+sentence-transformers
+streamlit
