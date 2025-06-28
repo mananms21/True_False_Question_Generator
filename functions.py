@@ -1,5 +1,5 @@
 import benepar
-from IPython.display import Markdown, display
+# from IPython.display import Markdown, display
 import re
 from string import punctuation
 import scipy
@@ -9,6 +9,11 @@ import torch
 from question_model import load_question_model
 benepar_parser = benepar.Parser("benepar_en3")
 
+import nltk
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
 model, model_BERT, tokenizer = load_question_model()
 
